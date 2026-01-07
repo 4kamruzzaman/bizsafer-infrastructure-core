@@ -1,25 +1,22 @@
-name: Manual Emergency Rollback
-
+name: Manual Backend Rollback
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: 'Target Version Tag (e.g., stable or v1.0.5)'
+      commit_hash:
+        description: 'Commit SHA to revert to'
         required: true
-        default: 'stable'
-
 jobs:
   rollback:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger Manual Restore
-        uses: appleboy/ssh-action@master
+      - uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.PROD_HOST }}
           username: ${{ secrets.PROD_USER }}
-          key: ${{ secrets.PROD_SSH_KEY }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /home/deploy/bizsafer-infra
-            sed -i "s/VERSION=.*/VERSION=${{ github.event.inputs.version }}/" .env
-            docker-compose up -d
-            docker ps
+            cd /var/www/bizsafer-panel
+            git checkout ${{ github.event.inputs.commit_hash }}
+            docker-compose up -d --build
+            # Optional: Rollback DB if needed (Dangerous, use with caution)
+            # docker-compose exec -T backend php artisan migrate --rollback --force
