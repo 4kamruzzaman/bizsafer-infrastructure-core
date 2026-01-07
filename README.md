@@ -36,7 +36,7 @@ The BizSafer ecosystem is orchestrated behind a hardened **Nginx reverse proxy**
 
 - **Frontend Application**  
   https://www.bizsafer.com  
-  *React + Vite + Node.js*
+  *React + Vite + Node.js + Backend API*
 
 - **Backend / Admin Panel**  
   https://panel.bizsafer.com  
