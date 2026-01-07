@@ -1,0 +1,45 @@
+name: Production Multi-Stack Deployment
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Build & Push Images
+        # Note: You would typically push to a registry like Docker Hub
+        run: |
+          docker build -t bizsafer-frontend:${{ github.sha }} ./frontend
+          docker build -t bizsafer-backend:${{ github.sha }} ./backend
+
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          script: |
+            cd /home/deploy/bizsafer-infra
+            # Update Version Tags
+            sed -i "s/VERSION=.*/VERSION=${{ github.sha }}/" .env
+            
+            docker-compose pull
+            docker-compose up -d
+            
+            # --- STAGE 5: AUTOMATED HEALTH GATE ---
+            echo "Verifying deployment health..."
+            sleep 40
+            HEALTH_STATUS=$(docker inspect -f '{{.State.Health.Status}}' bizsafer_backend)
+            
+            if [ "$HEALTH_STATUS" != "healthy" ]; then
+              echo "Health check FAILED. Reverting to stable version..."
+              sed -i "s/VERSION=.*/VERSION=stable/" .env
+              docker-compose up -d
+              exit 1
+            fi
+            echo "Deployment SUCCESSFUL."
