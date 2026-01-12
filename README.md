@@ -11,7 +11,7 @@ This repository serves as a **credibility anchor**, documenting the production-g
 ├── .github/workflows/
 │   ├── deploy.yml         # Backend CI/CD pipeline with testing & health gates
 │   └── rollback.yml       # Manual emergency rollback workflow
-├── app/                   # Laravel 11 + Filament + PHP 8.3 source
+├── app/                   # Laravel 12 + Filament + PHP 8.3 source
 ├── docker/                # Multi-stage Dockerfiles for PHP-FPM
 ├── nginx/
 │   └── backend.conf       # Nginx config for panel.bizsafer.com
@@ -23,7 +23,7 @@ This repository serves as a **credibility anchor**, documenting the production-g
 
 ## 🌐 Network & Core Architecture
 The BizSafer backend is delivered through a hardened **Nginx reverse proxy** and protected by **Cloudflare’s global edge network**.
-- **Admin Panel & Dashboard**: https://panel.bizsafer.com (PHP 8.3 + Laravel 11 + Filament).
+- **Admin Panel & Dashboard**: https://panel.bizsafer.com (PHP 8.3 + Laravel 12 + Filament).
 - **Public API Gateway**: Primary interface for frontend applications via `/api/v1/`.
 
 ## 🛠️ Technical Stack & Expertise
